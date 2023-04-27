@@ -34,12 +34,30 @@ runs:
         tag_prefix: "v"
         major_pattern: (MAJOR)
         minor_pattern: (MINOR)
-        version_format: v${major}.${minor}.${patch}-${{ github.head_ref }}.${incremement}
-    - name: Release generation
-      id: release_generation
+        version_format: v${major}.${minor}.${patch}
+    - name: Tag and Publish release
+      id: tag_release
+      env:
+        tag_name: ${{ steps.tag_generation.outputs.version_tag }}
+        target_commitish: ${{ github.sha }}
+        prerelease: ${{ inputs.prerelease || 'false' }}
+        files: ${{ inputs.files }}
+        name: ${{ inputs.name }}
+        body: ${{ inputs.body }}
+        draft: ${{ inputs.draft || 'false' }}
+        discussion_category_name: ${{ inputs.discussion_category_name }}
+        generate_release_notes: ${{ inputs.generate_release_notes || 'false' }}
+      uses: actions/github-script@v6
+      with:
+        retries: 3
+        script: |
+            const script = require('${{ github.action_path }}/script.js');
+            await script({github, context, core, glob});
+    - name: Only publish
+      if: ${{ false }}
       uses: softprops/action-gh-release@v0.1.15
       with:
-        tag_name: ${{ inputs.prerelease == 'true' && steps.tag_generation.outputs.version || steps.tag_generation.outputs.tag_name }}
+        tag_name: ${{ steps.tag_release.outputs.tag_name }}
         target_commitish: ${{ github.sha }}
         files: ${{ inputs.files }}
         prerelease: ${{inputs.prerelease }}
@@ -48,19 +66,3 @@ runs:
         draft: ${{ inputs.draft }}
         discussion_category_name: ${{ inputs.discussion_category_name }}
         generate_release_notes: ${{ inputs.generate_release_notes }}
-    - name: PR comment
-      if: github.event_name == 'pull_request'
-      uses: actions/github-script@v6
-      env:
-        release_url : steps.release_generation.outputs.url
-        type: ${{ inputs.prerelease == 'true' && 'prerelease' || 'release' }}
-        tag_name: ${{ inputs.prerelease == 'true' && steps.tag_generation.outputs.version || steps.tag_generation.outputs.tag_name }}
-      with:
-        retries: 3
-        script: |
-          await github.rest.issues.createComment(
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            issue_number: context.payload.number,
-            body: `The ${process.env.type} [${process.env.tag_name}](${process.env.release_url}) was created from this pull_request`
-          )
