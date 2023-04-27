@@ -62,7 +62,8 @@ runs:
             owner: context.repo.owner,
             repo: context.repo.repo,
             issue_number: context.payload.number,
-            body: `🎉 This PR generated version ${process.env.tag_name} 🎉
+            body: `
+                  🎉 This PR generated version ${process.env.tag_name} 🎉
 
                    The ${process.env.type} is available on [GitHub release](${process.env.release_url})
 
