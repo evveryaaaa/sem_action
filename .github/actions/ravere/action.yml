@@ -34,7 +34,7 @@ runs:
         tag_prefix: "v"
         major_pattern: (MAJOR)
         minor_pattern: (MINOR)
-        version_format: v${major}.${minor}.${patch}-${{ github.head_ref }}.${incremement}
+        version_format: v${major}.${minor}.${patch}-${{ github.head_ref }}.${increment}
     - name: Release generation
       id: release_generation
       uses: softprops/action-gh-release@v0.1.15
@@ -58,9 +58,9 @@ runs:
       with:
         retries: 3
         script: |
-          await github.rest.issues.createComment(
+          await github.rest.issues.createComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
             issue_number: context.payload.number,
             body: `The ${process.env.type} [${process.env.tag_name}](${process.env.release_url}) was created from this pull_request`
-          )
+          })
