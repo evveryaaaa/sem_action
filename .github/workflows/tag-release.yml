@@ -1,7 +1,7 @@
 name: Demo tag and release
 permissions:
   contents: write
-  actions: write
+  pull-requests: write
 on:
   pull_request:
     types:
