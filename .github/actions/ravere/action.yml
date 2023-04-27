@@ -65,7 +65,7 @@ runs:
             body: `
                   🎉 This PR generated version ${process.env.tag_name} 🎉
 
-                   The ${process.env.type} is available on [GitHub release](${process.env.release_url})
+                  The ${process.env.type} is available on [GitHub release](${process.env.release_url})
 
-                   Your github-actions bot 📦🚀`
+                  Your github-actions bot 📦🚀`
           })
