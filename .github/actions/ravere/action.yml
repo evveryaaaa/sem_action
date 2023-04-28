@@ -52,7 +52,7 @@ runs:
       if: github.event_name == 'pull_request'
       uses: actions/github-script@v6
       env:
-        release_url : steps.release_generation.outputs.url
+        release_url : ${{ steps.release_generation.outputs.url }}
         type: ${{ inputs.prerelease == 'true' && 'prerelease' || 'release' }}
         tag_name: ${{ inputs.prerelease == 'true' && steps.tag_generation.outputs.version || steps.tag_generation.outputs.tag_name }}
       with:
@@ -62,5 +62,10 @@ runs:
             owner: context.repo.owner,
             repo: context.repo.repo,
             issue_number: context.payload.number,
-            body: `The ${process.env.type} [${process.env.tag_name}](${process.env.release_url}) was created from this pull_request`
-          });
+            body: `
+            🎉 This PR generated version ${process.env.tag_name} 🎉
+
+            The ${process.env.type} is available on [GitHub release](${process.env.release_url})
+
+            Your github-actions bot 📦🚀`
+          })
