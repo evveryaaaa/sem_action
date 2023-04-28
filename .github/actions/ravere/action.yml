@@ -33,7 +33,7 @@ runs:
       with:
         tag_prefix: "v"
         major_pattern: '/^\b$/'
-        minor_pattern: ${{ startsWith(github.head_ref, 'feature/') && 'hjola' || '/^\b$/' }}
+        minor_pattern: ${{ startsWith(github.head_ref, 'feature/') && '/.*/' || '/^\b$/' }}
         version_format: v${major}.${minor}.${patch}-${{ github.head_ref }}.${increment}
     - name: Release generation
       id: release_generation
