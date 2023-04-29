@@ -1,0 +1,84 @@
+# This is a basic workflow to help you get started with Actions
+
+name: RA workfow
+
+# Controls when the workflow will run
+on:
+  workflow_call:    
+
+    outputs:
+      version:
+        value: ${{ jobs.set_versions.outputs.version }}
+      release:
+        value: ${{ jobs.set_versions.outputs.release }}
+      chart_version:
+        value: ${{ jobs.set_versions.outputs.chart_version }}
+
+jobs:
+  set_versions:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.app-version.outputs.version }}
+      release: ${{ steps.app-version.outputs.version_tag }}
+      chart_version: ${{ steps.chart-version.outputs.version }}
+    steps:
+     
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: suffix generation
+        id: suffix-generation
+        if: github.event_name != 'merge_group'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const head_ref = process.env.GITHUB_HEAD_REF;
+            const suffix_ref = `-${head_ref.split('/').pop().replace('/\W|_/g','')}.${process.env.RUN_NUMBER}`;
+            core.setOutput("suffix", suffix_ref);
+
+      - name: suffix generation
+        if: github.event_name != 'merge_group'
+        id: suffix-generation2
+        shell: bash
+        run: |
+            head_ref = ${GITHUB_HEAD_REF};
+            suffix_ref = $( echo ${head_ref##*/} | sed "s/[^[:alnum:]-]//g" );
+            echo "suffix=-${suffix_ref}.${GITHUB_RUN_NUMBER}" >> ${GITHUB_OUTPUT};
+
+      - name: app version
+        id: app-version
+        uses: paulhatch/semantic-version@v5.0.2
+        with:
+          tag_prefix: "v"
+          major_pattern: "(MAJOR)"
+          # major_regexp_flags: ""
+          minor_pattern: "(MINOR)"
+          # minor_regexp_flags: ""
+          version_format: "v${major}.${minor}.${patch}${{ steps.suffix-generation.outputs.suffix }}"
+          
+      - name: chart version     
+        id: chart-version
+        uses: paulhatch/semantic-version@v5.0.2
+        with:
+          tag_prefix: "c"
+          major_pattern: "(MAJOR-CHART)"
+          # major_regexp_flags: ""
+          minor_pattern: "(MINOR-CHART)"
+          # minor_regexp_flags: ""
+          version_format: "${major}.${minor}.${patch}${{ steps.suffix-generation.outputs.suffix }}"
+          change_path: "charts"
+
+      - name: Create tag and push
+        run: |
+          rc=0
+          git show-ref --tags ${{ steps.app-version.outputs.version }} --quiet || rc="$?"
+          
+          if  [ $rc -eq 0 ]; then
+            echo "App no changes, skip tagging ${{ steps.app-version.outputs.version }}"
+            
+          else
+            echo "App changed , pushing new version ${{ steps.app-version.outputs.version }} "
+            git tag ${{ steps.app-version.outputs.version }} && git push --tags    
+
+          fi
