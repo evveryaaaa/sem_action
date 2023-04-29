@@ -2,6 +2,9 @@
 
 name: RA workfow
 
+permissions:
+  contents: write
+
 # Controls when the workflow will run
 on:
   pull_request:
@@ -34,7 +37,7 @@ jobs:
         with:
           script: |
             const head_ref = process.env.GITHUB_HEAD_REF;
-            const suffix_ref = `-${head_ref.split('/').pop().replace('/\W|_/g','')}.${process.env.RUN_NUMBER}`;
+            const suffix_ref = `-${head_ref.split('/').pop().replace('/\W|_/g','')}.${process.env.GITHUB_RUN_NUMBER}`;
             core.setOutput("suffix", suffix_ref);
 
       - name: suffix generation
