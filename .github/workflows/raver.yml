@@ -42,8 +42,8 @@ jobs:
         id: suffix_generation2
         shell: bash
         run: |
-            head_ref = ${GITHUB_HEAD_REF};
-            suffix_ref = $( echo ${head_ref##*/} | sed "s/[^[:alnum:]-]//g" );
+            head_ref=${GITHUB_HEAD_REF};
+            suffix_ref=$( echo ${head_ref##*/} | sed "s/[^[:alnum:]-]//g" );
             echo "suffix=-${suffix_ref}.${GITHUB_RUN_NUMBER}" >> ${GITHUB_OUTPUT};
 
       - name: app version
