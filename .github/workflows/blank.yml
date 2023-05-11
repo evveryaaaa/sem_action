@@ -19,10 +19,10 @@ jobs:
         with:
           retries: 3
           script: |
-            let releases = await github.rest.repo.listReleases({owner: context.repo.owner, repo: context.repo.repo});
+            let releases = await github.rest.repos.listReleases({owner: context.repo.owner, repo: context.repo.repo});
             console.log(JSON.stringify(releases.data));
             
-            let release = await github.rest.repo.getReleaseByTag({
+            let release = await github.rest.repos.getReleaseByTag({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 tag: "idkever",
