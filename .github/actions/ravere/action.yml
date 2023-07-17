@@ -56,7 +56,7 @@ runs:
         generate_release_notes: ${{ inputs.generate_release_notes }}
     - name: ever
       shell: bash
-      run:
+      run: |
         echo ${{ steps.tag_generation.outputs.version }}
         echo ${{ steps.tag_generation.outputs.tag_name }}
     - name: PR comment
