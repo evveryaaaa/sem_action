@@ -55,6 +55,7 @@ runs:
         discussion_category_name: ${{ inputs.discussion_category_name }}
         generate_release_notes: ${{ inputs.generate_release_notes }}
     - name: ever
+      shell: bash
       run:
         echo ${{ steps.tag_generation.outputs.version }}
         echo ${{ steps.tag_generation.outputs.tag_name }}
