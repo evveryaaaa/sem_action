@@ -40,7 +40,7 @@ runs:
         tag_prefix: "v"
         major_pattern: '/^\b$/'
         minor_pattern: ${{ startsWith(github.head_ref, 'feature/') && '/.*/' || '/^\b$/' }}
-        version_format: v${major}.${minor}.${patch}-${{ github.head_ref }}.${increment}
+        version_format: ${major}.${minor}.${patch}-${{ github.head_ref }}.${increment}
     - name: Release generation
       id: release_generation
       uses: softprops/action-gh-release@v0.1.15
@@ -54,6 +54,11 @@ runs:
         draft: ${{ inputs.draft }}
         discussion_category_name: ${{ inputs.discussion_category_name }}
         generate_release_notes: ${{ inputs.generate_release_notes }}
+    - name: ever
+      shell: bash
+      run: |
+        echo ${{ steps.tag_generation.outputs.version }}
+        echo ${{ steps.tag_generation.outputs.tag_name }}
     - name: PR comment
       if: github.event_name == 'pull_request'
       uses: actions/github-script@v6
