@@ -58,7 +58,7 @@ runs:
       shell: bash
       run: |
         echo ${{ steps.tag_generation.outputs.version }}
-        echo ${{ steps.tag_generation.outputs.tag_name }}
+        echo ${{ steps.tag_generation.outputs.version_tag }}
     - name: PR comment
       if: github.event_name == 'pull_request'
       uses: actions/github-script@v6
